@@ -1,4 +1,4 @@
-*Approvals form prototype*
+# Approvals form prototype
 __Work in progress__
 This folder contains the digitised version of the "Application for Approval of Meat Establishment" form. It has been built with the (GDS prototyping toolkit)[https://govuk-prototype-kit.herokuapp.com/docs].
 
