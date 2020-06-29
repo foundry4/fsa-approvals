@@ -20,16 +20,21 @@
         <div class="govuk-form-group">
           <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--l" for="approval-name">
               What is the name of the approval name?
-              This is the sole trader, partner(s) or legal entity of the business.
             </label>
+            <span id="changed-name-hint" class="govuk-hint">
+              This is the sole trader, partner(s) or legal entity of the business.
+            </span>
         
           </h1>
           <input class="govuk-input" id="approval-name" name="approval-name" type="text">
         </div>
         <div class="govuk-form-group">
           <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--l" for="trading-name">
-              What is the trading name (if different from the approval name)
-            </label>
+            What is the trading name?
+          </label>
+          <span id="trading-name-hint" class="govuk-hint">
+            If the trading name is different to the approval name.
+          </span>
           </h1>
           <input class="govuk-input" id="trading-name" name="trading-name" type="text">
         </div>
