@@ -42,5 +42,27 @@ In order to use this prototype you will need [Node](https://nodejs.org/en/). You
 4. branch - application-type-answer
    1. change-of-fbo
    2. (new approval goes straight to business type)
-   3. new-fbo-approval
-5. business-structure-type
+   3. new-fsa-approval
+5. business-name
+6. business-structure-type
+7. branch - business-type-answer
+   1. incorporation > business-structure-incorporation --> Goes to:
+      1. business-company-information
+   2. partnership/sole-trader/other --> Goes to:
+8. business-structure-operator-name
+9. business-structure-operator-address
+10. telephone-number
+11. email
+12. type-of-establishment
+13. activities-throughput
+14. handling-animal-origin
+15. layout-plan
+16. location-map
+17. food-safety-management
+18. cleaning-maintenance
+19. abp-collector
+20. water-supply-quality - This should be split into arrangements and LA water test result.
+21. pest-control
+22. sops-cctv
+23. advisory-visit
+24. check-your-answers
