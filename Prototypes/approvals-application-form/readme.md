@@ -51,21 +51,22 @@ In order to use this prototype you will need [Node](https://nodejs.org/en/). You
    2. partnership/sole-trader/other --> Goes to:
 8. business-structure-operator-name
 9. business-structure-operator-address
-10. telephone-number
-11. email
-12. type-of-establishment
-13. activities-throughput
-14. handling-animal-origin
-15. layout-plan
-16. location-map
-17. food-safety-management
-18. cleaning-maintenance
-19. abp-collector
-20. water-supply-quality - This should be split into arrangements and LA water test result.
-21. pest-control
-22. sops-cctv
-23. advisory-visit
-24. check-your-answers
+10. operating-start-date
+11. telephone-number
+12. email
+13. type-of-establishment
+14. activities-throughput
+15. handling-animal-origin
+16. layout-plan
+17. location-map
+18. food-safety-management
+19. cleaning-maintenance
+20. abp-collector
+21. water-supply-quality - This should be split into arrangements and LA water test result.
+22. pest-control
+23. sops-cctv
+24. advisory-visit
+25. check-your-answers
 
 <!-- ddd -->
 <div class="govuk-summary-list__row">
