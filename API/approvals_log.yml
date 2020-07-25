@@ -20,11 +20,63 @@ components:
   schemas:
     ArrayOfApplications:
       type: array
+      description: "A collection of applications"
       items:
         $ref: '#/components/schemas/Application'
     Application:
       type: object
+      description: |
+        Represents an application that has been made to the FSA to create an establishment
+        Holds the lifecycle information about the application, and a reference to the eventually 
+        created establishment if the application is successful
+      required:
+        - id
       properties:
         id:
-          type: integer
+          type: string
           description: "A unique identifier for an application entry in the approvals log"
+        status:
+          type: string
+          enum:
+            - PreApproval
+            - Approved
+        establishment:
+          $ref: '#/components/schemas/Establishment'
+    Establishment:
+      type: object
+      required:
+        - id
+        - premises
+        - operator
+      description: |
+        A central unit of enrolment within food and feed related legislation
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/establishment.html)
+      properties:
+        id: 
+          type: string
+          description: 'A unique identifier for an establishment as described in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/establishment.html#unique-identifiers)'
+          pattern: '^\w{6}-\w{6}-\w{6}'
+        premises:
+          $ref: '#/components/schemas/Premise'
+        operator:
+          $ref: '#/components/schemas/Operator'
+    Premise:
+      type: object
+      required:
+        - uprn
+        - address
+      properties:
+        uprn:
+          type: string
+          description: |
+            Serves as the identifier of this individual premise, described further at
+            the (open id policy)[https://www.ordnancesurvey.co.uk/business-government/tools-support/open-mastermap-programme/open-id-policy] page
+        address:
+          type: object
+          description: "See the (key properties)[https://foodstandardsagency.github.io/enterprise-data-models/entities/premises.html#key-properties]"
+    Operator:
+      type: object
+      description: |
+        Operator is the person or legal entity responsible for running a food business. 
+        When considered in tandem with premises, the combined entity is an establishment.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/operator.html)
