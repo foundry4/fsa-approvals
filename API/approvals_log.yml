@@ -1,0 +1,30 @@
+openapi: '3.0.2'
+info:
+  title: FSA API Sketch
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+
+
+paths:
+  /applications:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfApplications'
+components:
+  schemas:
+    ArrayOfApplications:
+      type: array
+      items:
+        $ref: '#/components/schemas/Application'
+    Application:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "A unique identifier for an application entry in the approvals log"

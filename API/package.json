@@ -1,0 +1,14 @@
+{
+  "name": "fsa-api-sketches",
+  "version": "1.0.0",
+  "description": "Example sketches for proposed FSA APIs & Models",
+  "main": "index.js",
+  "scripts": {
+    "build": "swagger-markdown -i approvals_log.yml -o README.md"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "swagger-markdown": "^1.4.2"
+  }
+}
