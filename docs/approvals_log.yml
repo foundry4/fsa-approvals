@@ -9,6 +9,15 @@ servers:
 paths:
   /applications:
     get:
+      summary: 'Retrieve all applications'
+      description: |
+        Retrieve all applications that are being, or have been processed by the approvals team
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/ApplicationStatus'
+          description: Parameter to filter applications by a given status
       responses:
         '200':
           description: OK
@@ -18,6 +27,31 @@ paths:
                 $ref: '#/components/schemas/ArrayOfApplications'
 components:
   schemas:
+    ApplicationStatus:
+      type: string
+      enum:
+      - PreApproval
+      - Approved
+    ApplicationEvent:
+      type: object
+      description: 'An approval event for the attention of, or performed by the approvals team'
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+          - 'FBO Submitted application'
+          - 'FVL Advisory Visit'
+          - '3 Month FVL Visit'
+          - '6 Month FVL Visit'
+          - 'Approval granted'
+        dueBy:
+          type: string
+          format: date-time
+        completedOn:
+          type: string
+          format: date-time
     ArrayOfApplications:
       type: array
       description: "A collection of applications"
@@ -36,12 +70,13 @@ components:
           type: string
           description: "A unique identifier for an application entry in the approvals log"
         status:
-          type: string
-          enum:
-            - PreApproval
-            - Approved
+          $ref: '#/components/schemas/ApplicationStatus'
         establishment:
           $ref: '#/components/schemas/Establishment'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationEvent'
     Establishment:
       type: object
       required:
