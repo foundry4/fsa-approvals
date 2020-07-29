@@ -62,6 +62,23 @@
       </a>
       </dd>
     </div>
+
+    <!-- new FSA approval -->
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        Other type of business
+      </dt>
+      <dd class="govuk-summary-list__value">
+      {{data['business-type-other']}}
+      </dd>
+      <dd class="govuk-summary-list__actions">
+        <a href="/business-name">
+          Change
+          <span class="govuk-visually-hidden"> business type of other</span>
+        </a>
+      </dd>
+  </div>
+    
         
     
 <!-- business name -->
@@ -132,7 +149,7 @@
     Company registration number
   </dt>
   <dd class="govuk-summary-list__value">
-  {{data['company-registration-number]}}
+  {{data['company-registration-number']}}
   </dd>
   <dd class="govuk-summary-list__actions">
   <a href="/business-company-information">
@@ -175,9 +192,26 @@
   </a>
   </dd>
 </div>
+
+<!-- Operating start date -->
 <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">
-    Telephone number
+  Operating start date
+  </dt>
+  <dd class="govuk-summary-list__value">
+  {{data['operating-start-date-day']}}-{{data['operating-start-date-month']}}-{{data['operating-start-date-year']}}
+  </dd>
+  <dd class="govuk-summary-list__actions">
+  <a href="/operating-start-date">
+     Change
+     <span class="govuk-visually-hidden"> operating start date</span>
+  </a>
+  </dd>
+</div>
+
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">
+    phone number
   </dt>
   <dd class="govuk-summary-list__value">
     {{data['business-telephone']}}
