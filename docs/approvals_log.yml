@@ -27,14 +27,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrayOfApplications'
-  /applications/events:
+  /events:
     get:
       tags:
         - 'Applications'
-      summary: 'Retrieve all application events'
+      summary: 'Retrieve all events'
       description: |
-        Retrieve all application events assigned to applications
+        Retrieve all application events
       parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
         - in: query
           name: dueBy
           schema:
@@ -46,6 +52,76 @@ paths:
           schema:
             type: boolean
           description: Filter only those events that are completed or incompleted
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+  /applications/{id}/events:
+    get:
+      tags:
+        - 'Applications'
+      summary: "Retrieve an application's events"
+      description: |
+        Retrieve all application events assigned to a specific application
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: dueBy
+          schema:
+            type: string
+            format: date-time
+          description: An optional date component to filter events to those that have a due-by date on or before the given date
+        - in: query
+          name: completed
+          schema:
+            type: boolean
+          description: Filter only those events that are completed or incompleted
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+    post:
+      tags:
+        - 'Applications'
+      summary: 'Create an event for an application'
+      description: |
+        Create an application event
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+    put:
+      tags:
+        - 'Applications'
+      summary: 'Update an event for an application'
+      description: |
+        Update an application event
       responses:
         '200':
           description: OK
