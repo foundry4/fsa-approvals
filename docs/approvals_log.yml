@@ -5,12 +5,19 @@ info:
 servers:
   - url: https://api.server.test/v1
 
+tags:
+  - name: 'Approvals Team'
+    description: 'Data related specifically to the approvals team'
+  - name: 'Audit'
+    description: 'High level information retrieved from all available data'
+  - name: 'Core'
+    description: 'Information that is central to the FSA, coming either from E&P/SIR or similar systems of record'
 
 paths:
   /applications:
     get:
       tags:
-        - 'Applications'
+        - 'Approvals Team'
       summary: 'Retrieve all applications'
       description: |
         Retrieve all applications that are being, or have been processed by the approvals team
@@ -30,7 +37,7 @@ paths:
   /events:
     get:
       tags:
-        - 'Applications'
+        - 'Approvals Team'
       summary: 'Retrieve all events'
       description: |
         Retrieve all application events
@@ -66,7 +73,7 @@ paths:
   /applications/{id}/events:
     get:
       tags:
-        - 'Applications'
+        - 'Approvals Team'
       summary: "Retrieve an application's events"
       description: |
         Retrieve all application events assigned to a specific application
@@ -101,7 +108,7 @@ paths:
                     - $ref: '#/components/schemas/FvlVisitApplicationEvent'
     post:
       tags:
-        - 'Applications'
+        - 'Approvals Team'
       summary: 'Create an event for an application'
       description: |
         Create an application event
@@ -118,7 +125,7 @@ paths:
                     - $ref: '#/components/schemas/FvlVisitApplicationEvent'
     put:
       tags:
-        - 'Applications'
+        - 'Approvals Team'
       summary: 'Update an event for an application'
       description: |
         Update an application event
@@ -186,7 +193,84 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Establishment'
-
+  /schemes:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Scheme'
+  /premises:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Premise'
+  /operators:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operator'
+  /serviceDeliveryAreas:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceDeliveryArea'
+  /interventions:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Intervention'
+  /enforcements:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enforcement'
 components:
   schemas:
     ApplicationStatus:
@@ -369,6 +453,26 @@ components:
       properties:
         name:
           type: string
+    CompetentAuthority:
+      type: object
+      description: |
+        A Competent Authority is a body with regulatory or supervisory oversight of a scheme.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/competent-authority.html)
+    ServiceDeliveryArea:
+      type: object
+      description: |
+        A Service Delivery Area is a conceptual data entity to express a geographical area that is not associated with the jurisdiction of an existing Competent Authority or other official geography.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/service-delivery-area.html)
+    Enforcement:
+      type: object
+      description: |
+        Enforcement is the term for the available actions to a Competent Authority to make establishments obey food or feed law, regulations, or policy which falls within a scheme.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/enforcement.html)
+    Intervention:
+      type: object
+      description: |
+        An intervention is used by a Competent Authority to monitor and record the compliance of an establishments within a scheme.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/intervention.html)
     EstablishmentUniqueIdentifier:
       type: string
       description: 'A unique identifier for an establishment as described in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/establishment.html#unique-identifiers)'
