@@ -1,0 +1,494 @@
+openapi: '3.0.2'
+info:
+  title: FSA API Sketch
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+
+tags:
+  - name: 'Approvals Team'
+    description: 'Data related specifically to the approvals team'
+  - name: 'Audit'
+    description: 'High level information retrieved from all available data'
+  - name: 'Core'
+    description: 'Information that is central to the FSA, coming either from E&P/SIR or similar systems of record'
+
+paths:
+  /applications:
+    get:
+      tags:
+        - 'Approvals Team'
+      summary: 'Retrieve all applications'
+      description: |
+        Retrieve all applications that are being, or have been processed by the approvals team
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/ApplicationStatus'
+          description: Parameter to filter applications by a given status
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfApplications'
+  /events:
+    get:
+      tags:
+        - 'Approvals Team'
+      summary: 'Retrieve all events'
+      description: |
+        Retrieve all application events
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: dueBy
+          schema:
+            type: string
+            format: date-time
+          description: An optional date component to filter events to those that have a due-by date on or before the given date
+        - in: query
+          name: completed
+          schema:
+            type: boolean
+          description: Filter only those events that are completed or incompleted
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+  /applications/{id}/events:
+    get:
+      tags:
+        - 'Approvals Team'
+      summary: "Retrieve an application's events"
+      description: |
+        Retrieve all application events assigned to a specific application
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: dueBy
+          schema:
+            type: string
+            format: date-time
+          description: An optional date component to filter events to those that have a due-by date on or before the given date
+        - in: query
+          name: completed
+          schema:
+            type: boolean
+          description: Filter only those events that are completed or incompleted
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+    post:
+      tags:
+        - 'Approvals Team'
+      summary: 'Create an event for an application'
+      description: |
+        Create an application event
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+    put:
+      tags:
+        - 'Approvals Team'
+      summary: 'Update an event for an application'
+      description: |
+        Update an application event
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+  /reports/timespan:
+    get:
+      tags:
+        - 'Audit'
+      parameters:
+        - in: query
+          name: startEventId
+          description: The ID of the event to start the duration calculation from
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: endEventId
+          description: The ID of the (completed) event to end the duration calculation
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  duration:
+                    type: number
+                    example: 5
+                    description: The amount of time in days that elapsed between one event starting, and another completing
+  /people:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+  /establishments:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Establishment'
+  /schemes:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Scheme'
+  /premises:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Premise'
+  /operators:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operator'
+  /serviceDeliveryAreas:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceDeliveryArea'
+  /interventions:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Intervention'
+  /enforcements:
+    get:
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enforcement'
+components:
+  schemas:
+    ApplicationStatus:
+      type: string
+      enum:
+      - PreApproval
+      - Approved
+    Event:
+      type: object
+      description: 'A generic event, serving as a marker than a thing happened at a point in time'
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          $ref: '#/components/schemas/Person'
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/Person'
+    ApplicationEvent:
+      type: object
+      description: 'An approval event for the attention of, or performed by the approvals team'
+      required:
+        - type
+      allOf:
+        - $ref: '#/components/schemas/Event'
+        - type: object
+          properties:
+            formId:
+              type: string
+              description: The UUID of the application form that was submitted for this application event
+              format: uuid
+            type:
+              type: string
+              enum:
+              - 'FBO Submitted application'
+              - 'FVL Advisory Visit'
+              - '3 Month FVL Visit'
+              - '6 Month FVL Visit'
+              - 'Approval granted'
+            assignedTo:
+              $ref: '#/components/schemas/Person'
+            dueBy:
+              type: string
+              description: An optional field marking the event as an event that should be completed by a particular date
+              format: date-time
+            completedOn:
+              type: string
+              description: The date that an event was completed on
+              format: date-time
+    FboSubmittedApplicationEvent:
+      type: object
+      description: 'An event where an FBO submitted a digital application form for FSA approval'
+      allOf:
+        - $ref: '#/components/schemas/ApplicationEvent'
+        - type: object
+          properties:
+            formId:
+              type: string
+              description: The UUID of the application form that was submitted for this application event
+              format: uuid
+    FvlVisitApplicationEvent:
+      type: object
+      description: 'An event where an FVL visited, or is required to visit an FBO'
+      allOf:
+        - $ref: '#/components/schemas/ApplicationEvent'
+        - type: object
+          properties:
+            assignedFvl:
+              $ref: '#/components/schemas/Person'
+            fvlReportIdentifier:
+              type: string
+              description: 'The identifier (Wisdom path) for the submitted FVL report'
+    ArrayOfApplications:
+      type: array
+      description: "A collection of applications"
+      items:
+        $ref: '#/components/schemas/Application'
+    ApplicationForm:
+      type: object
+      description: |
+        Represents the data held from a digital application submission by the FBO
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique identifier for this digital form submission
+    Application:
+      type: object
+      description: |
+        Represents an application that has been made to the FSA to create an establishment
+        Holds the lifecycle information about the application, and a reference to the eventually 
+        created establishment if the application is successful
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "A unique identifier for an application entry in the approvals log"
+        status:
+          $ref: '#/components/schemas/ApplicationStatus'
+        establishmentId:
+          $ref: '#/components/schemas/EstablishmentUniqueIdentifier'
+        events:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+              - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+    Person:
+      type: object
+      description: |
+        An entry describing a person as known by the FSA
+        Corresponds to the data currently held in E&P in the 'tblPeople' table
+      properties:
+        id:
+          type: number
+          description: The unique identifier for a person in the tblPeople table 
+        jobTitle:
+          type: string
+          description: The description of this person's job role, e.g. the data in tblJobDetails
+    Establishment:
+      type: object
+      required:
+        - id
+        - premises
+        - operator
+      description: |
+        A central unit of enrolment within food and feed related legislation
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/establishment.html)
+      properties:
+        id: 
+          $ref: '#/components/schemas/EstablishmentUniqueIdentifier'
+        premises:
+          $ref: '#/components/schemas/Premise'
+        operator:
+          $ref: '#/components/schemas/Operator'
+        schemes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Scheme'
+    Premise:
+      type: object
+      required:
+        - uprn
+        - address
+      properties:
+        uprn:
+          type: string
+          description: |
+            Serves as the identifier of this individual premise, described further at
+            the (open id policy)[https://www.ordnancesurvey.co.uk/business-government/tools-support/open-mastermap-programme/open-id-policy] page
+        address:
+          type: object
+          description: "See the (key properties)[https://foodstandardsagency.github.io/enterprise-data-models/entities/premises.html#key-properties]"
+    Operator:
+      type: object
+      description: |
+        Operator is the person or legal entity responsible for running a food business. 
+        When considered in tandem with premises, the combined entity is an establishment.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/operator.html)
+    Scheme:
+      type: object
+      description: |
+        A scheme is a way of classifying a piece of regulation, legislation, or policy that grants powers to and/or imposes obligations on those who are enrolled in it.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/scheme.html)
+    Activity:
+      type: object
+      description: |
+        An activity is an action or power granted to food or feed businesses through registration, approval, or compliance with a specific regulatory scheme.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/activity.html)
+      properties:
+        name:
+          type: string
+    CompetentAuthority:
+      type: object
+      description: |
+        A Competent Authority is a body with regulatory or supervisory oversight of a scheme.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/competent-authority.html)
+    ServiceDeliveryArea:
+      type: object
+      description: |
+        A Service Delivery Area is a conceptual data entity to express a geographical area that is not associated with the jurisdiction of an existing Competent Authority or other official geography.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/service-delivery-area.html)
+    Enforcement:
+      type: object
+      description: |
+        Enforcement is the term for the available actions to a Competent Authority to make establishments obey food or feed law, regulations, or policy which falls within a scheme.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/enforcement.html)
+    Intervention:
+      type: object
+      description: |
+        An intervention is used by a Competent Authority to monitor and record the compliance of an establishments within a scheme.
+        See description in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/intervention.html)
+    EstablishmentUniqueIdentifier:
+      type: string
+      description: 'A unique identifier for an establishment as described in the [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/entities/establishment.html#unique-identifiers)'
+      pattern: '^\w{6}-\w{6}-\w{6}'
+      example: 'XXXXXX-XXXXXX-XXXXXX'
+    FSAPlantApprovalNumber:
+      type: string
+      description: 'The pattern for an FSA approval [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/patterns/plant-approval-number.html)'
+      pattern: '^[0-9]{4}(-[0-9]{4})?$'
+    LAPlantApprovalNumber:
+      type: string
+      description: 'The pattern for a local authority approval [FSA Data Standards](https://foodstandardsagency.github.io/enterprise-data-models/patterns/plant-approval-number.html)'
+      pattern: '^[A-Z]{2} [0-9]{3}$'
+    File:
+      type: object
+      description: 'Represents a file that has been stored in some common file store'
