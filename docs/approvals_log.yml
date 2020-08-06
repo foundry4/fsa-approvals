@@ -69,7 +69,21 @@ paths:
                 items:
                   oneOf:
                     - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+                    - $ref: '#/components/schemas/FvlReportSentToFBO'
+                    - $ref: '#/components/schemas/FVLReportSubmitted'
+          links:
+            GetPersonByCreatedBy:
+              operationId: getUser
+              parameters:
+                userId: '$response.body#/createdBy'
+            GetPersonByUpdatedBy:
+              operationId: getUser
+              parameters:
+                userId: '$response.body#/updatedBy'
+            GetPersonByAssignedTo:
+              operationId: getUser
+              parameters:
+                userId: '$response.body#/assignedTo'
   /applications/{id}/events:
     get:
       tags:
@@ -105,7 +119,8 @@ paths:
                 items:
                   oneOf:
                     - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+                    - $ref: '#/components/schemas/FvlReportSentToFBO'
+                    - $ref: '#/components/schemas/FVLReportSubmitted'
     post:
       tags:
         - 'Approvals Team'
@@ -122,7 +137,8 @@ paths:
                 items:
                   oneOf:
                     - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+                    - $ref: '#/components/schemas/FvlReportSentToFBO'
+                    - $ref: '#/components/schemas/FVLReportSubmitted'
     put:
       tags:
         - 'Approvals Team'
@@ -139,7 +155,8 @@ paths:
                 items:
                   oneOf:
                     - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+                    - $ref: '#/components/schemas/FvlReportSentToFBO'
+                    - $ref: '#/components/schemas/FVLReportSubmitted'
   /reports/timespan:
     get:
       tags:
@@ -183,6 +200,19 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Person'
+  /people/{id}:
+    get:
+      summary: Get a person by their id
+      operationId: getUser
+      tags:
+        - 'Core'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
   /establishments:
     get:
       tags:
@@ -292,12 +322,16 @@ components:
           type: string
           format: date-time
         createdBy:
-          $ref: '#/components/schemas/Person'
+          type: string
+          format: uuid
+          description: The UUID of the person this event was created by
         updatedAt:
           type: string
           format: date-time
         updatedBy:
-          $ref: '#/components/schemas/Person'
+          type: string
+          format: uuid
+          description: The UUID of the person this event was updated by
     ApplicationEvent:
       type: object
       description: 'An approval event for the attention of, or performed by the approvals team'
@@ -307,10 +341,6 @@ components:
         - $ref: '#/components/schemas/Event'
         - type: object
           properties:
-            formId:
-              type: string
-              description: The UUID of the application form that was submitted for this application event
-              format: uuid
             type:
               type: string
               enum:
@@ -321,7 +351,9 @@ components:
               - 'FVLReportSentToFBO'
               - 'ConditionalApprovalGranted'
             assignedTo:
-              $ref: '#/components/schemas/Person'
+              type: string
+              format: uuid
+              description: The UUID of the person this event is assigned to
             dueBy:
               type: string
               description: An optional field marking the event as an event that should be completed by a particular date
@@ -417,7 +449,8 @@ components:
           items:
             oneOf:
               - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-              - $ref: '#/components/schemas/FvlVisitApplicationEvent'
+              - $ref: '#/components/schemas/FVLReportSentToFBO'
+              - $ref: '#/components/schemas/FVLReportSubmitted'
     Person:
       type: object
       description: |
