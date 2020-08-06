@@ -314,11 +314,12 @@ components:
             type:
               type: string
               enum:
-              - 'FBO Submitted application'
-              - 'FVL Advisory Visit'
-              - '3 Month FVL Visit'
-              - '6 Month FVL Visit'
-              - 'Approval granted'
+              - 'FBOApplicationSubmitted'
+              - 'FVLOfficialVisitArranged'
+              - 'FVLOfficialVisit'
+              - 'FVLReportSubmitted'
+              - 'FVLReportSentToFBO'
+              - 'ConditionalApprovalGranted'
             assignedTo:
               $ref: '#/components/schemas/Person'
             dueBy:
@@ -329,6 +330,26 @@ components:
               type: string
               description: The date that an event was completed on
               format: date-time
+            parentEvent:
+              type: string
+              format: uuid
+              description: |
+                Marks that this event was created by a parent event being completed.  For example, an FVLReportSubmitted event is created from the completion of an FVLOfficialVisit event
+                and these two events are intrinsically linked together, despite being separate events to complete
+    FVLApplicationEvent:
+      type: object
+      description: Any event that involves an FVL.  FVLs repeat a process multiple times, so this event marks which of the processes (Advisory, Initial, 3 Month, 6 Month) this event refers to
+      allOf:
+        - $ref: '#/components/schemas/ApplicationEvent'
+        - type: object
+          properties:
+            visitType:
+              type: string
+              enum:
+                - AdvisoryVisit
+                - FirstVisit
+                - 3MonthVisit
+                - 6MonthVisit
     FboSubmittedApplicationEvent:
       type: object
       description: 'An event where an FBO submitted a digital application form for FSA approval'
@@ -340,18 +361,24 @@ components:
               type: string
               description: The UUID of the application form that was submitted for this application event
               format: uuid
-    FvlVisitApplicationEvent:
+    FVLReportSubmitted:
       type: object
-      description: 'An event where an FVL visited, or is required to visit an FBO'
+      description: 'An event where an FVL submitted, or is required to submit a report to the approvals team by a point in time'
       allOf:
-        - $ref: '#/components/schemas/ApplicationEvent'
+        - $ref: '#/components/schemas/FVLApplicationEvent'
         - type: object
           properties:
-            assignedFvl:
-              $ref: '#/components/schemas/Person'
-            fvlReportIdentifier:
-              type: string
-              description: 'The identifier (Wisdom path) for the submitted FVL report'
+            file:
+              $ref: '#/components/schemas/File'
+    FVLReportSentToFBO:
+      type: object
+      description: 'An event where an FVL report was sent to the FBO'
+      allOf:
+        - $ref: '#/components/schemas/FVLApplicationEvent'
+        - type: object
+          properties:
+            file:
+              $ref: '#/components/schemas/File'
     ArrayOfApplications:
       type: array
       description: "A collection of applications"
@@ -395,14 +422,21 @@ components:
       type: object
       description: |
         An entry describing a person as known by the FSA
-        Corresponds to the data currently held in E&P in the 'tblPeople' table
+        Corresponds to the data currently held in E&P in the 'tblPeople' table.
+        A critial data item, as centralizing the identity of 'who' has done an item of work is necessary for a variety of reporting purposes
+        and data standardisation
       properties:
         id:
           type: number
-          description: The unique identifier for a person in the tblPeople table 
+          description: The unique identifier for a person in the tblPeople table
         jobTitle:
           type: string
           description: The description of this person's job role, e.g. the data in tblJobDetails
+          example: 'JobTitle'
+        name:
+          type: string
+          description: The name of this person
+          example: 'Joe Bloggs'
     Establishment:
       type: object
       required:
@@ -492,3 +526,29 @@ components:
     File:
       type: object
       description: 'Represents a file that has been stored in some common file store'
+      properties:
+        id:
+          type: string
+          format: uuid
+        uploaded_on:
+          type: string
+          format: date-time
+          description: The date the file was uploaded
+        uploaded_by_id:
+          type: number
+          description: A link to a person field, who uploaded the record
+        previous_file_id:
+          type: string
+          format: uuid
+          description: Marks a file as replacing a previously uploaded file
+        document_type:
+          type: string
+          enum:
+            - LayoutPlan
+            - LocationMap
+            - FoodSafetySystem
+            - CleaningArrangements
+            - ABPCollectorDetails
+            - WaterSupplyQuality
+            - PestControlArrangements
+            - WelfareSOPs
