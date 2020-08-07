@@ -14,26 +14,26 @@ tags:
     description: 'Information that is central to the FSA, coming either from E&P/SIR or similar systems of record'
 
 paths:
-  /applications:
+  /cases:
     get:
       tags:
         - 'Approvals Team'
-      summary: 'Retrieve all applications'
+      summary: 'Retrieve all cases'
       description: |
-        Retrieve all applications that are being, or have been processed by the approvals team
+        Retrieve all cases that are being, or have been processed by the approvals team
       parameters:
         - in: query
           name: status
           schema:
             $ref: '#/components/schemas/ApplicationStatus'
-          description: Parameter to filter applications by a given status
+          description: Parameter to filter cases by a given status
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfApplications'
+                $ref: '#/components/schemas/ArrayOfCases'
   /events:
     get:
       tags:
@@ -68,8 +68,8 @@ paths:
                 type: array
                 items:
                   oneOf:
-                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlReportSentToFBO'
+                    - $ref: '#/components/schemas/CaseManagementEvent'
+                    - $ref: '#/components/schemas/FVLReportSentToFBO'
                     - $ref: '#/components/schemas/FVLReportSubmitted'
           links:
             GetPersonByCreatedBy:
@@ -84,16 +84,16 @@ paths:
               operationId: getUser
               parameters:
                 userId: '$response.body#/assignedTo'
-  /applications/{id}/events:
+  /cases/{reference}/events:
     get:
       tags:
         - 'Approvals Team'
-      summary: "Retrieve an application's events"
+      summary: "Retrieve an case's events"
       description: |
-        Retrieve all application events assigned to a specific application
+        Retrieve all case events assigned to a specific case
       parameters:
         - in: path
-          name: id
+          name: reference
           schema:
             type: string
             format: uuid
@@ -117,14 +117,13 @@ paths:
               schema:
                 type: array
                 items:
-                  oneOf:
-                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlReportSentToFBO'
-                    - $ref: '#/components/schemas/FVLReportSubmitted'
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CaseManagementEvent'
     post:
       tags:
         - 'Approvals Team'
-      summary: 'Create an event for an application'
+      summary: 'Create an event for a case'
       description: |
         Create an application event
       responses:
@@ -133,30 +132,20 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlReportSentToFBO'
-                    - $ref: '#/components/schemas/FVLReportSubmitted'
+                $ref: '#/components/schemas/CaseManagementEvent'
     put:
       tags:
         - 'Approvals Team'
-      summary: 'Update an event for an application'
+      summary: 'Update an event for an case'
       description: |
-        Update an application event
+        Update a case event
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
-                    - $ref: '#/components/schemas/FvlReportSentToFBO'
-                    - $ref: '#/components/schemas/FVLReportSubmitted'
+                $ref: '#/components/schemas/CaseManagementEvent'
   /reports/timespan:
     get:
       tags:
@@ -311,13 +300,25 @@ components:
       enum:
       - PreApproval
       - Approved
-    Event:
+      - Enquiring
+      - Applied
+      - Application Withdrawn
+      - Refused
+      - Appealing
+      - Conditionally Approved
+      - Extended Conditionally Approved
+      - Fully Approved
+      - Conditionally Approved - Under Review
+      - Extended Conditionally Approved - Under Review
+      - Fully Approved - Under Review
+      - Surrendered
+      - Suspended
+      - Withdrawn
+      - Change Requested
+    AuditedItem:
       type: object
-      description: 'A generic event, serving as a marker than a thing happened at a point in time'
+      description: 'An audited item, tracking when an item was created and updated, and who by'
       properties:
-        id:
-          type: string
-          format: uuid
         createdAt:
           type: string
           format: date-time
@@ -332,15 +333,22 @@ components:
           type: string
           format: uuid
           description: The UUID of the person this event was updated by
-    ApplicationEvent:
+    CaseManagementEvent:
       type: object
       description: 'An approval event for the attention of, or performed by the approvals team'
       required:
         - type
       allOf:
-        - $ref: '#/components/schemas/Event'
+        - $ref: '#/components/schemas/AuditedItem'
         - type: object
           properties:
+            id:
+              type: string
+              format: uuid
+            ruleGrouping:
+              type: string
+              format: uuid
+              description: A field that groups together events for the purpose of applying a rule, e.g. A set of events that must be completed for a status to change
             type:
               type: string
               enum:
@@ -368,11 +376,11 @@ components:
               description: |
                 Marks that this event was created by a parent event being completed.  For example, an FVLReportSubmitted event is created from the completion of an FVLOfficialVisit event
                 and these two events are intrinsically linked together, despite being separate events to complete
-    FVLApplicationEvent:
+    FVLCaseManagementEvent:
       type: object
       description: Any event that involves an FVL.  FVLs repeat a process multiple times, so this event marks which of the processes (Advisory, Initial, 3 Month, 6 Month) this event refers to
       allOf:
-        - $ref: '#/components/schemas/ApplicationEvent'
+        - $ref: '#/components/schemas/CaseManagementEvent'
         - type: object
           properties:
             visitType:
@@ -382,11 +390,11 @@ components:
                 - FirstVisit
                 - 3MonthVisit
                 - 6MonthVisit
-    FboSubmittedApplicationEvent:
+    FboSubmittedCaseManagementEvent:
       type: object
       description: 'An event where an FBO submitted a digital application form for FSA approval'
       allOf:
-        - $ref: '#/components/schemas/ApplicationEvent'
+        - $ref: '#/components/schemas/CaseManagementEvent'
         - type: object
           properties:
             formId:
@@ -397,7 +405,7 @@ components:
       type: object
       description: 'An event where an FVL submitted, or is required to submit a report to the approvals team by a point in time'
       allOf:
-        - $ref: '#/components/schemas/FVLApplicationEvent'
+        - $ref: '#/components/schemas/FVLCaseManagementEvent'
         - type: object
           properties:
             file:
@@ -406,16 +414,16 @@ components:
       type: object
       description: 'An event where an FVL report was sent to the FBO'
       allOf:
-        - $ref: '#/components/schemas/FVLApplicationEvent'
+        - $ref: '#/components/schemas/FVLCaseManagementEvent'
         - type: object
           properties:
             file:
               $ref: '#/components/schemas/File'
-    ArrayOfApplications:
+    ArrayOfCases:
       type: array
-      description: "A collection of applications"
+      description: "A collection of cases"
       items:
-        $ref: '#/components/schemas/Application'
+        $ref: '#/components/schemas/Case'
     ApplicationForm:
       type: object
       description: |
@@ -427,19 +435,19 @@ components:
           type: string
           format: uuid
           description: A unique identifier for this digital form submission
-    Application:
+    Case:
       type: object
       description: |
-        Represents an application that has been made to the FSA to create an establishment
+        Represents an application that has been made to the FSA to create an establishment, and all the tasks associated with it
         Holds the lifecycle information about the application, and a reference to the eventually 
         created establishment if the application is successful
       required:
-        - id
+        - reference
       properties:
-        id:
+        reference:
           type: string
           format: uuid
-          description: "A unique identifier for an application entry in the approvals log"
+          description: "A unique identifier for an application entry, similar to a row in the approvals log"
         status:
           $ref: '#/components/schemas/ApplicationStatus'
         establishmentId:
@@ -448,7 +456,7 @@ components:
           type: array
           items:
             oneOf:
-              - $ref: '#/components/schemas/FboSubmittedApplicationEvent'
+              - $ref: '#/components/schemas/FboSubmittedCaseManagementEvent'
               - $ref: '#/components/schemas/FVLReportSentToFBO'
               - $ref: '#/components/schemas/FVLReportSubmitted'
     Person:
