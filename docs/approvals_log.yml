@@ -84,6 +84,23 @@ paths:
               operationId: getUser
               parameters:
                 userId: '$response.body#/assignedTo'
+  /events/{eventId}:
+    delete:
+      tags:
+        - 'Approvals Team'
+      summary: Delete an event
+      description: |
+        Delete an event by ID
+      parameters:
+        - in: path
+          name: eventId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: OK
   /cases/{reference}/events:
     get:
       tags:
@@ -126,6 +143,8 @@ paths:
       summary: 'Create an event for a case'
       description: |
         Create an application event
+      requestBody:
+        $ref: '#/components/schemas/CaseManagementEvent'
       responses:
         '200':
           description: OK
@@ -139,6 +158,8 @@ paths:
       summary: 'Update an event for an case'
       description: |
         Update a case event
+      requestBody:
+        $ref: '#/components/schemas/CaseManagementEvent'
       responses:
         '200':
           description: OK
